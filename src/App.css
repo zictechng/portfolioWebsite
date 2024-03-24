@@ -27,6 +27,15 @@
 .App-link {
   color: #61dafb;
 }
+.tp-offcanvas-area {
+  display: none; /* Offcanvas is hidden by default */
+  /* Add other styling for your offcanvas area here */
+}
+
+.tp-offcanvas-area.active {
+  display: block; /* Offcanvas is shown when 'active' class is added */
+  /* Add other styling for active state here */
+}
 
 @keyframes App-logo-spin {
   from {
