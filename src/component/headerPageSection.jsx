@@ -10,7 +10,7 @@ const HeaderPageSection = ({buttonClick}) => {
             <div className="row align-items-center">
                <div className="col-xxl-3 col-xl-3 col-lg-3">
                   <div className="tp-logo text-start">
-                     <a href="index.html"><img src="assets/img/logo/logo-blue.png" alt=""/></a>
+                     <a href="/"><img src="assets/img/logo/logo-blue.png" alt=""/></a>
                   </div>
                </div>
                <div className="col-xxl-5 col-xl-6 col-lg-6">

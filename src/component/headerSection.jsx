@@ -11,7 +11,7 @@ const HeaderSection = ({buttonClick}) => {
             <div className="row align-items-center">
                <div className="col-xl-3 col-lg-3">
                   <div className="tp-logo">
-                     <a href="index"><img src="assets/img/logo/logo-blue.png" alt=""/></a>
+                     <a href="/"><img src="assets/img/logo/logo-blue.png" alt=""/></a>
                   </div>
                </div>
                <div className="col-xl-7 col-lg-7">

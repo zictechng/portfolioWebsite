@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import SideBarSection from '../component/sideBarSection';
 import MobileMenuSection from '../component/mobileMenuSection';
-import HeaderSection from '../component/headerSection';
 import FooterSection from '../component/footerSection';
 import PushToButton from '../component/pushTopButton';
+import BreadCrumbSection from '../component/breadcrumbSection';
+import HeaderPageSection from '../component/headerPageSection';
 
 const AboutPage = () => {
   const [isOffcanvasVisible, setIsOffcanvasVisible] = useState(false);
   const [isSubMenuVisible, setIsSubMenuVisible] = useState([]);
-
+  const pageTitle = 'About';
   // Function to toggle offcanvas visibility
   const toggleOffcanvas = () => {
     setIsOffcanvasVisible(!isOffcanvasVisible);
@@ -28,7 +29,7 @@ const AboutPage = () => {
   };
   return (
     <>
-      <HeaderSection 
+      <HeaderPageSection 
       buttonClick={toggleOffcanvas} />
 
       {/* mobile-menu-area  */}
@@ -47,6 +48,10 @@ const AboutPage = () => {
       <div className="body-overlay"></div>
 
       <main>
+
+         <BreadCrumbSection 
+            data={pageTitle}
+         />
       {/* <!-- tp-abou-me-area-start --> */}
     <div className="am-about-me-area pt-110 pb-100">
          <div className="container">

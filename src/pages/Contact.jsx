@@ -4,12 +4,19 @@ import SideBarSection from '../component/sideBarSection';
 import HeaderPageSection from '../component/headerPageSection';
 import FooterSection from '../component/footerSection';
 import BreadCrumbSection from '../component/breadcrumbSection';
-import { Link } from 'react-router-dom';
+import { Bounce, ToastContainer, toast } from 'react-toastify';
+import PushToButton from '../component/pushTopButton';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import Spinner from 'react-bootstrap/Spinner';
+import client from '../component/client';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Contact = () => {
    const [isOffcanvasVisible, setIsOffcanvasVisible] = useState(false);
    const [isSubMenuVisible, setIsSubMenuVisible] = useState([]);
    const pageTitle = 'Contact';
+   const correctAnswer = '3';
    // Function to toggle offcanvas visibility
    const toggleOffcanvas = () => {
      setIsOffcanvasVisible(!isOffcanvasVisible);
@@ -27,6 +34,109 @@ const Contact = () => {
        }
      });
    };
+
+   const [fullName, setFullName] = useState("");
+   const [contactPhone, setContactPhone] = useState("");
+   const [contactEmail, setContactEmail] = useState("");
+   const [contactMessage, setContactMessage] = useState("");
+   const [contactAnswer, setContactAnswer] = useState("");
+   
+   const [showLoader, setShowLoader] = useState(false);
+   const [showModal, setShowModal] = useState(false);
+
+    // submit contact form here by checking details
+  const submitCOntactForm  = () =>{
+    
+   if(fullName === '' || contactPhone === '' || contactEmail === '' || contactMessage === ''){
+     toast.error('All fields required', {
+       position: "top-right",
+       autoClose: 3000,
+       hideProgressBar: true,
+       closeOnClick: true,
+       pauseOnHover: true,
+       draggable: true,
+       progress: undefined,
+       theme: "colored",
+       });
+       return
+     }
+     if(contactAnswer !== correctAnswer) {
+      toast.error('Security Checked Failed! Wrong Answered', {
+         position: "top-right",
+         autoClose: 3000,
+         hideProgressBar: true,
+         closeOnClick: true,
+         pauseOnHover: true,
+         draggable: true,
+         progress: undefined,
+         theme: "colored",
+         });
+         return
+     }
+     else if(fullName !== '' && contactPhone !== '' && contactEmail !== '' && contactMessage !== ''){
+       setShowModal(true);
+       }
+    }
+
+    // process the data to backend api call
+    const processMessage = async() => {
+      
+      setShowLoader(true)
+      const sendData ={
+        "customer_name": fullName,
+        "customer_email": contactEmail,
+        "customer_phone": contactPhone,
+        "customer_message": contactMessage,
+      }
+      //console.log("Sending...", sendData)
+      try {
+        const res = await client.post(`/api/submit_ticketWebsite`, sendData, {
+        })
+        if(res.data.msg =='200'){
+          toast.success('Message sent successfully',
+              {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                transition: Bounce,
+                newestOnTop: false,
+                theme: "light",
+                });
+                setFullName("")
+                setContactEmail("")
+                setContactMessage("")
+                setContactPhone("")
+                setContactAnswer("")
+            }
+          else if(res.data.status =='500'){
+            toast.error(res.data.message, {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "colored",
+              });
+            }
+          } catch (error) {
+            console.log(error.message)
+          }
+          finally{
+            setShowLoader(false)
+            setShowModal(false);
+          }
+    }
+
+    // close confirm modal
+    const closeModal = () =>{
+      setShowModal(false);
+      setShowLoader(false)   
+    }
 
   return (
     <>
@@ -73,22 +183,44 @@ const Contact = () => {
                   </div> --> */}
                  </div>
                </div>
+               
                <div className="col-xl-6 col-lg-6">
                   <div className="tpcontact">
-                        {/* <?php echo $success_message?> */}
+                  <ToastContainer/>
                      <h4 className="tp-contact-big-title">Let’s Talk...</h4>
                      <p>How may I help you today? please, drop me a message I will get back swiftly, thank you.</p>
                        
                      <div className="tpcontact__form tpcontact__form-3">
-                        {/* <form method="post"> */}
-                        <input name="name" type="text" placeholder="Enter your Name" />
-                           <input name="email" type="email" placeholder="Enter your Mail" />
-                           <input name="phone_number" type="number" placeholder="Enter your Phone" />
-                           <textarea name="contact_message" placeholder="Enter your Message"></textarea>
+                     <form onSubmit={e => e.preventDefault()}>
+                        <input name="name" 
+                           value={fullName}
+                           required="required"
+                           onChange={(e) => setFullName(e.target.value)}
+                           type="text" placeholder="Enter your Name *" />
+                           
+                           <input name="email" type="email"
+                           value={contactEmail}
+                           placeholder="Email*"
+                           required="required"
+                           onChange={(e) => setContactEmail(e.target.value.trim())}
+                            />
+                           <input 
+                           value={contactPhone}
+                           required="required"
+                           onChange={(e) => setContactPhone(e.target.value.trim())}
+                           name="phone_number" type="number" placeholder="Enter your Phone" />
+                           <textarea name="contact_message"
+                           value={contactMessage}
+                           onChange={(e) => setContactMessage(e.target.value)}
+                            placeholder="Enter your Message*"></textarea>
                            <h3>3+4-4</h3>
-                           <input name="ques" type="number" placeholder="Enter correct answer"/>
-                           <button type="submit" name="btn_contact" className="tp-btn-yellow">Send Message</button>
-                        {/* </form> */}
+                           <input name="ques" 
+                           value={contactAnswer}
+                           required="required"
+                           onChange={(e) => setContactAnswer(e.target.value.trim())}
+                           type="number" placeholder="Enter correct answer"/>
+                           <button className="tp-btn-yellow" onClick={() => submitCOntactForm()}>Send Message</button>
+                        </form>
                         
                      </div>
                      <p className="ajax-response"></p>
@@ -98,8 +230,38 @@ const Contact = () => {
          </div>
       </div>
     </main>
+    <Modal show={showModal} 
+        onHide={closeModal}
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+        backdrop="static"
+        keyboard={false}>
+          <Modal.Header>
+          <Modal.Title>Notice!</Modal.Title>
+        </Modal.Header>
+          <Modal.Body><p>By submitting this form, be rest assured I will get in shortly!</p></Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={closeModal} disabled={showLoader}>
+                Close
+              </Button>
+                <Button className="btn" onClick={processMessage} disabled={showLoader}>
+                 {showLoader ? <>
+                  <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                    />{" "}
+                  Processing...
+                </> : 'Send Message'}
+              </Button>
+            </Modal.Footer>
+        
+        </Modal>
 
     <FooterSection/>
+    <PushToButton/>
     </body>
     </>
   );
