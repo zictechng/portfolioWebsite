@@ -385,9 +385,6 @@ const IndexPage = () => {
       <FooterSection/>
 
       {/* backto-top-area-start */}
-      <button className="scroll-top scroll-to-target d-md-none" data-target="html">
-      <i className="far fa-angle-double-up"></i>
-    </button>
       <PushToButton />
     </>
   );
