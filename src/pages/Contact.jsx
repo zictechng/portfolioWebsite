@@ -81,9 +81,9 @@ const Contact = () => {
                        
                      <div className="tpcontact__form tpcontact__form-3">
                         {/* <form method="post"> */}
-                        <input name="name" value='<?php echo @$contact_name?>' type="text" placeholder="Enter your Name" />
-                           <input name="email" value='<?php echo @$contact_email?>' type="email" placeholder="Enter your Mail" />
-                           <input name="phone_number" value='<?php echo @$phone_contact?>' type="number" placeholder="Enter your Phone" />
+                        <input name="name" type="text" placeholder="Enter your Name" />
+                           <input name="email" type="email" placeholder="Enter your Mail" />
+                           <input name="phone_number" type="number" placeholder="Enter your Phone" />
                            <textarea name="contact_message" placeholder="Enter your Message"></textarea>
                            <h3>3+4-4</h3>
                            <input name="ques" type="number" placeholder="Enter correct answer"/>
