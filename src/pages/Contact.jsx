@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MobileMenuSection from '../component/mobileMenuSection';
 import SideBarSection from '../component/sideBarSection';
 import HeaderPageSection from '../component/headerPageSection';
@@ -11,7 +11,7 @@ import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 import client from '../component/client';
 import 'react-toastify/dist/ReactToastify.css';
-import { createContact } from '../store/contactSlice';
+import { postData } from '../store/contactSlice';
 import StatusCode from '../utility/StatusCode';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -24,7 +24,7 @@ const Contact = () => {
    const correctAnswer = '3';
 
    // get state value from the store
-   const {status, errorMessage, data} = useSelector( state => state.contact)
+   const {status, errorMessage, data, loading, error, success} = useSelector( state => state.contact)
 
    // Function to toggle offcanvas visibility
    const toggleOffcanvas = () => {
@@ -100,8 +100,13 @@ const Contact = () => {
         "customer_message": contactMessage,
       }
       //console.log("Sending...", sendData)
-      dispatch(createContact(sendData)) 
-     
+      dispatch(postData(sendData)) 
+      
+      // if(status === "true") {
+      //   setShowModal(false);
+      //   setShowLoader(false)
+      //   console.log('Action Status: ' + loading);
+      // }
       // try {
       //   const res = await client.post(`/api/submit_ticketWebsite`, sendData, {
       //   })
@@ -145,8 +150,32 @@ const Contact = () => {
       //     }
     }
 
-    console.log('Action Status: ' + status);
+    useEffect(() => {
+      // If success flag is true, reset the form data
+      if (success) {
+        setFullName("")
+        setContactEmail("")
+        setContactMessage("")
+        setContactPhone("")
+        setContactAnswer("");
+      toast.success('Message sent successfully',
+        {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          transition: Bounce,
+          newestOnTop: false,
+          theme: "light",
+          });
+        closeModal()
+      }
+    }, [success]);
+    
     console.log('Action State: ' + JSON.stringify(data));
+    console.log('Page State: ' + loading);
     console.log('Action Data: ' + response);
     
     // close confirm modal
