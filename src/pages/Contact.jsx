@@ -11,12 +11,21 @@ import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 import client from '../component/client';
 import 'react-toastify/dist/ReactToastify.css';
+import { createContact } from '../store/contactSlice';
+import StatusCode from '../utility/StatusCode';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Contact = () => {
+  const dispatch = useDispatch();
+
    const [isOffcanvasVisible, setIsOffcanvasVisible] = useState(false);
    const [isSubMenuVisible, setIsSubMenuVisible] = useState([]);
    const pageTitle = 'Contact';
    const correctAnswer = '3';
+
+   // get state value from the store
+   const {status, errorMessage, data} = useSelector( state => state.contact)
+
    // Function to toggle offcanvas visibility
    const toggleOffcanvas = () => {
      setIsOffcanvasVisible(!isOffcanvasVisible);
@@ -40,10 +49,11 @@ const Contact = () => {
    const [contactEmail, setContactEmail] = useState("");
    const [contactMessage, setContactMessage] = useState("");
    const [contactAnswer, setContactAnswer] = useState("");
+   const [response, setResponse] = useState([]);
    
    const [showLoader, setShowLoader] = useState(false);
    const [showModal, setShowModal] = useState(false);
-
+  
     // submit contact form here by checking details
   const submitCOntactForm  = () =>{
     
@@ -79,8 +89,9 @@ const Contact = () => {
     }
 
     // process the data to backend api call
-    const processMessage = async() => {
-      
+    const processMessage = async(e) => {
+      e.preventDefault();
+
       setShowLoader(true)
       const sendData ={
         "customer_name": fullName,
@@ -89,49 +100,55 @@ const Contact = () => {
         "customer_message": contactMessage,
       }
       //console.log("Sending...", sendData)
-      try {
-        const res = await client.post(`/api/submit_ticketWebsite`, sendData, {
-        })
-        if(res.data.msg =='200'){
-          toast.success('Message sent successfully',
-              {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                transition: Bounce,
-                newestOnTop: false,
-                theme: "light",
-                });
-                setFullName("")
-                setContactEmail("")
-                setContactMessage("")
-                setContactPhone("")
-                setContactAnswer("")
-            }
-          else if(res.data.status =='500'){
-            toast.error(res.data.message, {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "colored",
-              });
-            }
-          } catch (error) {
-            console.log(error.message)
-          }
-          finally{
-            setShowLoader(false)
-            setShowModal(false);
-          }
+      dispatch(createContact(sendData)) 
+     
+      // try {
+      //   const res = await client.post(`/api/submit_ticketWebsite`, sendData, {
+      //   })
+      //   if(res.data.msg =='200'){
+      //     toast.success('Message sent successfully',
+      //         {
+      //           position: "top-right",
+      //           autoClose: 3000,
+      //           hideProgressBar: true,
+      //           closeOnClick: true,
+      //           pauseOnHover: true,
+      //           draggable: true,
+      //           transition: Bounce,
+      //           newestOnTop: false,
+      //           theme: "light",
+      //           });
+      //           setFullName("")
+      //           setContactEmail("")
+      //           setContactMessage("")
+      //           setContactPhone("")
+      //           setContactAnswer("")
+      //       }
+      //     else if(res.data.status =='500'){
+      //       toast.error(res.data.message, {
+      //         position: "top-right",
+      //         autoClose: 3000,
+      //         hideProgressBar: true,
+      //         closeOnClick: true,
+      //         pauseOnHover: true,
+      //         draggable: true,
+      //         progress: undefined,
+      //         theme: "colored",
+      //         });
+      //       }
+      //     } catch (error) {
+      //       console.log(error.message)
+      //     }
+      //     finally{
+      //       setShowLoader(false)
+      //       setShowModal(false);
+      //     }
     }
 
+    console.log('Action Status: ' + status);
+    console.log('Action State: ' + JSON.stringify(data));
+    console.log('Action Data: ' + response);
+    
     // close confirm modal
     const closeModal = () =>{
       setShowModal(false);
@@ -140,8 +157,6 @@ const Contact = () => {
 
   return (
     <>
-    <body>
-
     <HeaderPageSection 
       buttonClick={toggleOffcanvas} />
    
@@ -262,7 +277,6 @@ const Contact = () => {
 
     <FooterSection/>
     <PushToButton/>
-    </body>
     </>
   );
 }
