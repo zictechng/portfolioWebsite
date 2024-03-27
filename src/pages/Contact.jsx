@@ -9,11 +9,11 @@ import PushToButton from '../component/pushTopButton';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
-import client from '../component/client';
 import 'react-toastify/dist/ReactToastify.css';
 import { postData } from '../store/contactSlice';
 import StatusCode from '../utility/StatusCode';
 import { useDispatch, useSelector } from 'react-redux';
+import IsValidEmail from '../component/checkEmailValid';
 
 const Contact = () => {
   const dispatch = useDispatch();
@@ -49,7 +49,7 @@ const Contact = () => {
    const [contactEmail, setContactEmail] = useState("");
    const [contactMessage, setContactMessage] = useState("");
    const [contactAnswer, setContactAnswer] = useState("");
-   const [response, setResponse] = useState([]);
+   const [response, setResponse] = useState({});
    
    const [showLoader, setShowLoader] = useState(false);
    const [showModal, setShowModal] = useState(false);
@@ -83,6 +83,19 @@ const Contact = () => {
          });
          return
      }
+     if(!IsValidEmail(contactEmail)){
+      toast.error('Please, enter valid email format', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        });
+        return
+     }
      else if(fullName !== '' && contactPhone !== '' && contactEmail !== '' && contactMessage !== ''){
        setShowModal(true);
        }
@@ -101,58 +114,13 @@ const Contact = () => {
       }
       //console.log("Sending...", sendData)
       dispatch(postData(sendData)) 
-      
-      // if(status === "true") {
-      //   setShowModal(false);
-      //   setShowLoader(false)
-      //   console.log('Action Status: ' + loading);
-      // }
-      // try {
-      //   const res = await client.post(`/api/submit_ticketWebsite`, sendData, {
-      //   })
-      //   if(res.data.msg =='200'){
-      //     toast.success('Message sent successfully',
-      //         {
-      //           position: "top-right",
-      //           autoClose: 3000,
-      //           hideProgressBar: true,
-      //           closeOnClick: true,
-      //           pauseOnHover: true,
-      //           draggable: true,
-      //           transition: Bounce,
-      //           newestOnTop: false,
-      //           theme: "light",
-      //           });
-      //           setFullName("")
-      //           setContactEmail("")
-      //           setContactMessage("")
-      //           setContactPhone("")
-      //           setContactAnswer("")
-      //       }
-      //     else if(res.data.status =='500'){
-      //       toast.error(res.data.message, {
-      //         position: "top-right",
-      //         autoClose: 3000,
-      //         hideProgressBar: true,
-      //         closeOnClick: true,
-      //         pauseOnHover: true,
-      //         draggable: true,
-      //         progress: undefined,
-      //         theme: "colored",
-      //         });
-      //       }
-      //     } catch (error) {
-      //       console.log(error.message)
-      //     }
-      //     finally{
-      //       setShowLoader(false)
-      //       setShowModal(false);
-      //     }
     }
 
     useEffect(() => {
       // If success flag is true, reset the form data
-      if (success) {
+      if (status === StatusCode.SUCCESS) {
+        setResponse(JSON.stringify(data))
+
         setFullName("")
         setContactEmail("")
         setContactMessage("")
@@ -172,11 +140,7 @@ const Contact = () => {
           });
         closeModal()
       }
-    }, [success]);
-    
-    console.log('Action State: ' + JSON.stringify(data));
-    console.log('Page State: ' + loading);
-    console.log('Action Data: ' + response);
+    }, [status, data]);
     
     // close confirm modal
     const closeModal = () =>{
@@ -238,6 +202,7 @@ const Contact = () => {
                      <form onSubmit={e => e.preventDefault()}>
                         <input name="name" 
                            value={fullName}
+                           maxLength={25}
                            required="required"
                            onChange={(e) => setFullName(e.target.value)}
                            type="text" placeholder="Enter your Name *" />
@@ -251,10 +216,12 @@ const Contact = () => {
                            <input 
                            value={contactPhone}
                            required="required"
+                           maxLength={12}
                            onChange={(e) => setContactPhone(e.target.value.trim())}
                            name="phone_number" type="number" placeholder="Enter your Phone" />
                            <textarea name="contact_message"
                            value={contactMessage}
+                           maxLength={350}
                            onChange={(e) => setContactMessage(e.target.value)}
                             placeholder="Enter your Message*"></textarea>
                            <h3>3+4-4</h3>
@@ -285,11 +252,11 @@ const Contact = () => {
         </Modal.Header>
           <Modal.Body><p>By submitting this form, be rest assured I will get in shortly!</p></Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={closeModal} disabled={showLoader}>
+              <Button variant="secondary" onClick={closeModal} disabled={loading}>
                 Close
               </Button>
-                <Button className="btn" onClick={processMessage} disabled={showLoader}>
-                 {showLoader ? <>
+                <Button className="btn" onClick={processMessage} disabled={loading}>
+                 {loading ? <>
                   <Spinner
                   as="span"
                   animation="border"
